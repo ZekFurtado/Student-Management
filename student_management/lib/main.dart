@@ -39,15 +39,12 @@ class _LoginState extends State<Login>{
       }
       else{
         setState(() {
-          setState(() {
-            signedIn = false;
-          });
+          signedIn = false;
         });
       }
     });
     if(FirebaseAuth.instance.currentUser==null) return [
-      Center(
-        child: MenuButton(
+      MenuButton(
             title: 'LOGIN',
             color: Colors.white,
             hoveredTextColor: Colors.black,
@@ -121,27 +118,12 @@ class _LoginState extends State<Login>{
                         )
                     )
                 );
-              }, context: context,
+              },
+              context: context,
 
             );
           },
         ),
-      ),
-      /*const Padding(padding: EdgeInsets.only(left: 10)),
-      const Center(
-        child: Text("|",style: TextStyle(fontFamily: 'Merriweather')),
-      ),
-      const Padding(padding: EdgeInsets.only(left: 10)),
-      Center(
-        child: MenuButton(
-            title: 'REGISTER',
-            color: Colors.white,
-            hoveredTextColor: Colors.black,
-            notHoveredTextColor: Colors.white,
-            textSize: 15,
-          onPressed: (){},
-        ),
-      ),*/
       Padding(padding: EdgeInsets.only(left: MediaQuery.of(context).size.width/5)),
     ];
     else return [
@@ -152,7 +134,7 @@ class _LoginState extends State<Login>{
         notHoveredTextColor: Colors.white,
         textSize: 15,
         onPressed: (){
-          Navigator.pushReplacement(
+          Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => Dashboard()
@@ -168,32 +150,45 @@ class _LoginState extends State<Login>{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: const Color(0xffff6816),
-          titleSpacing: MediaQuery.of(context).size.width/10,
-          title: Row(
-            children: const [
-              Icon(Icons.phone),
-              Text("1800 123 456",style: TextStyle(fontFamily: 'Merriweather')),
-              Padding(padding: EdgeInsets.only(left: 50)),
-              Icon(Icons.email),
-              Text("abc@def.com",style: TextStyle(fontFamily: 'Merriweather'))
-            ],
-          ),
-          actions: actions(context),
-          bottom: AppBar(
-            backgroundColor: const Color(0xff000000),
-            // toolbarHeight: 80,
+            backgroundColor: const Color(0xffff6816),
+            toolbarHeight: 80,
+            elevation: 20,
             title: const Text("NIRMALA HIGH SCHOOL",style: TextStyle(fontFamily: 'Merriweather',color: Colors.white,)),
             titleSpacing: MediaQuery.of(context).size.width/10,
             actions: [
-              MenuButton(title: 'HOME',color: Color(0xffff6816),hoveredTextColor: Colors.white,notHoveredTextColor: Colors.white,textSize: 15,onPressed: (){},),
-              MenuButton(title: 'PAGES',color: Color(0xffff6816),hoveredTextColor: Colors.white,notHoveredTextColor: Colors.white,textSize: 15,onPressed: (){},),
-              MenuButton(title: 'COURSES',color: Color(0xffff6816),hoveredTextColor: Colors.white,notHoveredTextColor: Colors.white,textSize: 15,onPressed: (){},),
-              MenuButton(title: 'CONTACT',color: Color(0xffff6816),hoveredTextColor: Colors.white,notHoveredTextColor: Colors.white,textSize: 15,onPressed: (){},),
+              MenuButton(title: 'HOME',
+                color: Colors.white,
+                hoveredTextColor: Colors.black,
+                notHoveredTextColor: Colors.white,
+                textSize: 15,
+                onPressed: (){},
+              ),
+              MenuButton(title: 'PAGES',
+                color: Colors.white,
+                hoveredTextColor: Colors.black,
+                notHoveredTextColor: Colors.white,
+                textSize: 15,
+                onPressed: (){},
+              ),
+              MenuButton(title: 'COURSES',
+                color: Colors.white,
+                hoveredTextColor: Colors.black,
+                notHoveredTextColor: Colors.white,
+                textSize: 15,
+                onPressed: (){},
+              ),
+              MenuButton(title: 'CONTACT',
+                color: Colors.white,
+                hoveredTextColor: Colors.black,
+                notHoveredTextColor: Colors.white,
+                textSize: 15,
+                onPressed: (){},
+              ),
+              actions(context).first,
               Padding(padding: EdgeInsets.only(right: MediaQuery.of(context).size.width/10))
             ],
-          )
-      ),
+          ),
+      // ),
       body: ListView(
         children: [
           SizedBox(

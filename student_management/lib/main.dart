@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dashboard.dart';
 
 void main() async{
@@ -128,20 +129,20 @@ class _LoginState extends State<Login>{
     ];
     else return [
       MenuButton(
-        title: FirebaseAuth.instance.currentUser!.email as String,
-        color: Colors.white,
-        hoveredTextColor: Colors.black,
-        notHoveredTextColor: Colors.white,
-        textSize: 15,
-        onPressed: (){
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Dashboard()
-            )
-          );
-        }
-      ),
+                title: FirebaseAuth.instance.currentUser?.email as String,
+                color: Colors.white,
+                hoveredTextColor: Colors.black,
+                notHoveredTextColor: Colors.white,
+                textSize: 15,
+                onPressed: (){
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Dashboard()
+                      )
+                  );
+                }
+            ),
       Padding(padding: EdgeInsets.only(left: MediaQuery.of(context).size.width/10)),
     ];
   }

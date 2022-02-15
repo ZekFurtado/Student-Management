@@ -79,7 +79,7 @@ class DashboardState extends State<Dashboard>{
                       ),
                       child: ListView(
                         children: [
-                          Padding(padding: EdgeInsets.only(top: 100)),
+                          Padding(padding: EdgeInsets.only(top: 50)),
                           Container(
                             height: 300,
                             decoration: BoxDecoration(
@@ -89,6 +89,14 @@ class DashboardState extends State<Dashboard>{
                           ),
                           Padding(padding: EdgeInsets.only(top: 50)),
                           Text("${snapshot.data?.get('fname')} ${snapshot.data?.get('mname')} ${snapshot.data?.get('lname')}",textAlign: TextAlign.center,),
+                          Padding(padding: EdgeInsets.only(top: 10)),
+                          Text('STD: ${snapshot.data?.get('std')}     DIV: ${snapshot.data?.get('div')}     Roll No:${snapshot.data?.get('roll no')}',textAlign: TextAlign.center),
+                          Padding(padding: EdgeInsets.only(top: 10)),
+                          Text('DOB: ${snapshot.data?.get('dob').toString()}',textAlign: TextAlign.center,),
+                          Padding(padding: EdgeInsets.only(top: 10)),
+                          Text('Address: ${snapshot.data?.get('address').toString()}',textAlign: TextAlign.center,),
+                          Padding(padding: EdgeInsets.only(top: 10)),
+                          Text('City: ${snapshot.data?.get('city').toString()}',textAlign: TextAlign.center,),
                           Padding(padding: EdgeInsets.only(top: 50)),
                           TextButton(
                             child: Text("Student Details"),
@@ -133,6 +141,17 @@ class DashboardState extends State<Dashboard>{
                               setState(() {
                                 menu = 'r';
                               });
+                            },
+                          ),
+                          Divider(
+                            indent: 40,
+                            endIndent: 40,
+                          ),
+                          TextButton(
+                            child: Text("Logout"),
+                            onPressed: () async{
+                              await FirebaseAuth.instance.signOut();
+                              Navigator.pop(context);
                             },
                           ),
                           Divider(
@@ -296,29 +315,60 @@ class _SubSectionState extends State<SubSection> {
 
           // ATTENDANCE DETAILS
 
-      FutureBuilder(
-        future: FirebaseFirestore.instance.collection('creds').doc(FirebaseAuth.instance.currentUser?.uid).get(),
-          builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot){
-          if(snapshot.hasData){
-            List<DateTime> holidays = [];
-            for(var date in snapshot.data?.get('holidays')) holidays.add(DateTime.fromMillisecondsSinceEpoch(date.seconds*1000));
-            print(DateTime.fromMillisecondsSinceEpoch(snapshot.data?.get('holidays')[0].seconds*1000));
-            return TableCalendar(
-              focusedDay: DateTime.now(),
-              firstDay: DateTime(2019),
-              lastDay: DateTime.now(),
+      Padding(
+        padding: EdgeInsets.all(50),
+        child: FutureBuilder(
+            future: FirebaseFirestore.instance.collection('creds').doc(FirebaseAuth.instance.currentUser?.uid).get(),
+            builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot){
+              if(snapshot.hasData){
+                List<DateTime> holidays = [];
+                for(var date in snapshot.data?.get('holidays')) holidays.add(DateTime.fromMillisecondsSinceEpoch(date.seconds*1000));
+                Duration diff = DateTime.now().difference(DateTime(2021,7,1));
+                double percentage = (diff.inDays-holidays.length)*100/diff.inDays;
+                return Column(
+                  children: [
+                    TableCalendar(
+                      focusedDay: DateTime.now(),
+                      firstDay: DateTime(2021,7),
+                      lastDay: DateTime.now(),
 
-              eventLoader: (day){
-                if(holidays.contains(day.toLocal())) return [1];
-                else return [];
-              },
-            );
-          }
-          else return Center(
-              child: CircularProgressIndicator()
-          );
-          })
-    )    ;
+                      eventLoader: (day){
+                        if(holidays.contains(day.toLocal())) return [1];
+                        else return [];
+                      },
+                    ),
+                    Padding(padding: EdgeInsets.only(top: 100),),
+                    Stack(
+                      children: [
+                        Container(
+                          height: 49.9,
+                          width: (MediaQuery.of(context).size.width/1.65-100),
+                          color: Colors.black,
+                        ),
+                        Container(
+                          height: 50,
+                          width: percentage*(MediaQuery.of(context).size.width/1.65-100.1)/100,
+                          color: Colors.green,
+                          child: Center(
+                            child: Text("${percentage.toString().substring(0,4)}%",style: TextStyle(color: Colors.white,fontSize: 25),)
+                          )
+                        )
+                      ],
+                    ),
+                    Padding(padding: EdgeInsets.only(top: 50)),
+                    Text(""),
+                    Text(""),
+                    Text(""),
+
+                  ],
+                );
+              }
+              else return Center(
+                  child: CircularProgressIndicator()
+              );
+            })
+      )
+    );
   }
 }
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_firestore_web/cloud_firestore_web.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 import 'main.dart';
 
@@ -170,6 +170,7 @@ class SubSection extends StatefulWidget {
 }
 
 class _SubSectionState extends State<SubSection> {
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -183,32 +184,141 @@ class _SubSectionState extends State<SubSection> {
           ]
       ),
       child: widget.option=='sd'?
+
+          //STUDENT DETAILS
+
+      Column(
+        children: [
+          Container(
+            height: 510,
+            // width: MediaQuery.of(context).size.width/1.65,
+            // color: Colors.orange,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+              image: DecorationImage(
+                image: AssetImage('dashboard.jpg',),
+                fit: BoxFit.fill
+              )
+            ),
+          ),
+          Padding(padding: EdgeInsets.only(top: 30)),
+          FutureBuilder(
+              future: FirebaseFirestore.instance.collection('creds').doc(FirebaseAuth.instance.currentUser?.uid).get(),
+              builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot){
+                if(snapshot.hasData){
+                  return GridView(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 1,
+                      crossAxisSpacing: 1,
+                      childAspectRatio: 7.5
+                    ),
+                    physics: NeverScrollableScrollPhysics(),
+                    padding: EdgeInsets.all(30),
+                    shrinkWrap: true,
+                    children: [
+                      Text(
+                            'Name: ${snapshot.data?.get('fname')} ${snapshot.data?.get('mname')} ${snapshot.data?.get('lname')}',
+                            style: TextStyle(fontSize: 25),
+                      ),
+                      Text(
+                        'Address: ${snapshot.data?.get('address')}',
+                        style: TextStyle(fontSize: 25),
+                      ),
+                      Text(
+                        'STD: ${snapshot.data?.get('std')}',
+                        style: TextStyle(fontSize: 25),
+                      ),
+                      Text(
+                        'DOB: ${snapshot.data?.get('dob').toString()}',
+                        style: TextStyle(fontSize: 25),
+                      ),
+                      Text(
+                        'DIV: ${snapshot.data?.get('div').toString()}',
+                        style: TextStyle(fontSize: 25),
+                      ),
+                      Text(
+                        'City: ${snapshot.data?.get('city').toString()}',
+                        style: TextStyle(fontSize: 25),
+                      ),
+
+                    ],
+                  );
+                }
+                else return Center(
+                    child: CircularProgressIndicator()
+                );
+              }
+          )
+        ],
+      ):
+
+          //FEE DETAILS
+
+      widget.option=='fd'?Padding(
+        padding: EdgeInsets.all(50),
+        child: ListView(
+          children: [
+            ListTile(
+              title: Text('Tuition Fees'),
+              trailing: Text("2700"),
+            ),
+            Divider(),
+            ListTile(
+              title: Text('Tuition Fees'),
+              trailing: Text("2700"),
+            ),
+            Divider(),
+            ListTile(
+              title: Text('Tuition Fees'),
+              trailing: Text("2700"),
+            ),
+            Divider(),
+            ListTile(
+              title: Text('Tuition Fees'),
+              trailing: Text("2700"),
+            ),
+            Divider(),
+            ListTile(
+              title: Text('Tuition Fees'),
+              trailing: Text("2700"),
+            ),
+            Divider(),
+            ListTile(
+              title: Text('Tuition Fees'),
+              trailing: Text("2700"),
+            ),
+            Divider(),
+
+          ],
+        )
+      ):
+
+          // ATTENDANCE DETAILS
+
       FutureBuilder(
         future: FirebaseFirestore.instance.collection('creds').doc(FirebaseAuth.instance.currentUser?.uid).get(),
           builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot){
           if(snapshot.hasData){
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Text('Name: ${snapshot.data?.get('fname')} ${snapshot.data?.get('mname')} ${snapshot.data?.get('lname')}'),
-                    Text('')
-                  ],
-                )
-              ],
+            List<DateTime> holidays = [];
+            for(var date in snapshot.data?.get('holidays')) holidays.add(DateTime.fromMillisecondsSinceEpoch(date.seconds*1000));
+            print(DateTime.fromMillisecondsSinceEpoch(snapshot.data?.get('holidays')[0].seconds*1000));
+            return TableCalendar(
+              focusedDay: DateTime.now(),
+              firstDay: DateTime(2019),
+              lastDay: DateTime.now(),
+
+              eventLoader: (day){
+                if(holidays.contains(day.toLocal())) return [1];
+                else return [];
+              },
             );
           }
           else return Center(
               child: CircularProgressIndicator()
           );
-      }
-    ):
-      Container(
-
-      )
-    );
+          })
+    )    ;
   }
 }
 

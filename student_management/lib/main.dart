@@ -30,6 +30,7 @@ class _LoginState extends State<Login>{
 
   List<Widget> actions(BuildContext context){
     bool signedIn = false;
+    bool showPass = false;
     FirebaseAuth.instance
         .authStateChanges()
         .listen((User? user) {
@@ -55,69 +56,94 @@ class _LoginState extends State<Login>{
             showDialog(
               builder: (BuildContext context) {
                 return SizedBox(
-                    child: AlertDialog(
-                        title: const Text("Log In",textAlign: TextAlign.center,),
-                        content: Form(
-                            key: _formkey,
-                            child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  TextFormField(
-                                    cursorColor: Colors.black,
-                                    decoration: const InputDecoration(
-                                      hintText: "Email",
-                                      focusedBorder: UnderlineInputBorder(
-                                        borderSide: BorderSide(
-                                            color: Color(0xffff6816)
+                    child: StatefulBuilder(
+                      builder: (context, setState) => AlertDialog(
+                          title: const Text("Log In",textAlign: TextAlign.center,),
+                          content: Form(
+                              key: _formkey,
+                              child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    TextFormField(
+                                      cursorColor: Colors.black,
+                                      decoration: const InputDecoration(
+                                        hintText: "Email",
+                                        focusedBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: Color(0xffff6816)
+                                          ),
                                         ),
                                       ),
+                                      validator: (value){
+                                        if(!isEmail(value!)) return "Invalid Email";
+                                      },
+                                      textInputAction: TextInputAction.next,
+                                      onSaved: (value){
+                                        _email = value!;
+                                      },
                                     ),
-                                    validator: (value){
-                                      if(!isEmail(value!)) return "Invalid Email";
-                                    },
-                                    onSaved: (value){
-                                      _email = value!;
-                                    },
-                                  ),
-                                  TextFormField(
-                                    cursorColor: Colors.black,
-                                    decoration: const InputDecoration(
-                                      hintText: "Password",
-                                      focusedBorder: UnderlineInputBorder(
-                                        borderSide: BorderSide(
-                                            color: Color(0xffff6816)
-                                        ),
+                                    TextFormField(
+                                      cursorColor: Colors.black,
+                                      decoration: InputDecoration(
+                                          hintText: "Password",
+                                          focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: const Color(0xffff6816)
+                                            ),
+                                          ),
+                                          suffixIcon: IconButton(
+                                            splashRadius: 15,
+                                            icon: !showPass?Icon(Icons.visibility,color: Colors.grey,):Icon(Icons.visibility_off,color: Color(0xffff6816)),
+                                            onPressed: (){
+                                              setState(() {
+                                                showPass = !showPass;
+                                              });
+                                            },
+                                          )
                                       ),
-                                    ),
-                                    onSaved: (value){
-                                      _password = value!;
-                                    },
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 20),
-                                  ),
-                                  TextButton(
-                                    style: ButtonStyle(
-                                        backgroundColor: MaterialStateProperty.all(Color(0xffff6816))
-                                    ),
-                                    child: Text("Login",style: TextStyle(color: Colors.white)),
-                                    onPressed: () async{
-                                      if(_formkey.currentState!.validate()) {
-                                        _formkey.currentState!.save();
-                                        print("email: $_email, password: $_password");
-                                        await FirebaseAuth.instance.signInWithEmailAndPassword(email: _email, password: _password);
-                                        Navigator.pop(context);
-                                        setState(() {
+                                      textInputAction: TextInputAction.done,
+                                      onFieldSubmitted: (value) async{
+                                        if(_formkey.currentState!.validate()) {
+                                          _formkey.currentState!.save();
+                                          print("email: $_email, password: $_password");
+                                          await FirebaseAuth.instance.signInWithEmailAndPassword(email: _email, password: _password);
+                                          Navigator.pop(context);
+                                          setState(() {
 
-                                        });
-                                      }
-                                    },
-                                  )
-                                ]
-                            )
-                        )
-                    )
+                                          });
+                                        }
+                                      },
+                                      obscureText: !showPass,
+                                      onSaved: (value){
+                                        _password = value!;
+                                      },
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 20),
+                                    ),
+                                    TextButton(
+                                      style: ButtonStyle(
+                                          backgroundColor: MaterialStateProperty.all(Color(0xffff6816))
+                                      ),
+                                      child: Text("Login",style: TextStyle(color: Colors.white)),
+                                      onPressed: () async{
+                                        if(_formkey.currentState!.validate()) {
+                                          _formkey.currentState!.save();
+                                          print("email: $_email, password: $_password");
+                                          await FirebaseAuth.instance.signInWithEmailAndPassword(email: _email, password: _password);
+                                          Navigator.pop(context);
+                                          setState(() {
+
+                                          });
+                                        }
+                                      },
+                                    )
+                                  ]
+                              )
+                          )
+                      )),
+
                 );
               },
               context: context,
@@ -189,7 +215,6 @@ class _LoginState extends State<Login>{
               Padding(padding: EdgeInsets.only(right: MediaQuery.of(context).size.width/10))
             ],
           ),
-      // ),
       body: ListView(
         children: [
           SizedBox(

@@ -13,7 +13,7 @@ class Dashboard extends StatefulWidget {
 }
 
 class DashboardState extends State<Dashboard>{
-  String menu = 'sd';
+  String menu = 's';
 
   @override
   Widget build(BuildContext context) {
@@ -60,114 +60,214 @@ class DashboardState extends State<Dashboard>{
         future: FirebaseFirestore.instance.collection('creds').doc(FirebaseAuth.instance.currentUser?.uid).get(),
         builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot){
           if(snapshot.hasData){
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Padding(padding: EdgeInsets.only(top: 5)),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width/5,
-                      height: MediaQuery.of(context).size.height/1.2,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(20)),
-                          color: Colors.grey[200],
-                          boxShadow: [
-                            BoxShadow(blurRadius: 10, color: Color(0xffbdbdbd))
-                          ]
-                      ),
-                      child: ListView(
-                        children: [
-                          Padding(padding: EdgeInsets.only(top: 50)),
-                          Container(
-                            height: 300,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.red,
+            Map<String,dynamic> data = snapshot.data?.data() as Map<String,dynamic>;
+            if(data.containsKey('admin')) return Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width/5,
+                    height: MediaQuery.of(context).size.height/1.2,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        color: Colors.grey[200],
+                        boxShadow: [
+                          BoxShadow(blurRadius: 10, color: Color(0xffbdbdbd))
+                        ]
+                    ),
+                    child: Padding(
+                        padding: EdgeInsets.only(left: 50,right:50),
+                        child: ListView(
+                          children: [
+                            Padding(padding: EdgeInsets.only(top: 50)),
+                            Container(
+                              height: 300,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.red,
+                              ),
                             ),
-                          ),
-                          Padding(padding: EdgeInsets.only(top: 50)),
-                          Text("${snapshot.data?.get('fname')} ${snapshot.data?.get('mname')} ${snapshot.data?.get('lname')}",textAlign: TextAlign.center,),
-                          Padding(padding: EdgeInsets.only(top: 10)),
-                          Text('STD: ${snapshot.data?.get('std')}     DIV: ${snapshot.data?.get('div')}     Roll No:${snapshot.data?.get('roll no')}',textAlign: TextAlign.center),
-                          Padding(padding: EdgeInsets.only(top: 10)),
-                          Text('DOB: ${snapshot.data?.get('dob').toString()}',textAlign: TextAlign.center,),
-                          Padding(padding: EdgeInsets.only(top: 10)),
-                          Text('Address: ${snapshot.data?.get('address').toString()}',textAlign: TextAlign.center,),
-                          Padding(padding: EdgeInsets.only(top: 10)),
-                          Text('City: ${snapshot.data?.get('city').toString()}',textAlign: TextAlign.center,),
-                          Padding(padding: EdgeInsets.only(top: 50)),
-                          TextButton(
-                            child: Text("Student Details"),
-                            onPressed: (){
-                              setState(() {
-                                menu = 'sd';
-                              });
-                            },
-                          ),
+                            Padding(padding: EdgeInsets.only(top: 20)),
+                            Text("${snapshot.data?.get('fname')} ${snapshot.data?.get('lname')}",textAlign: TextAlign.center,style: TextStyle(fontSize: 30),),
+                            Padding(padding: EdgeInsets.only(top: 10)),
+                            Text('STD: ${snapshot.data?.get('std')}     DIV: ${snapshot.data?.get('div')}',textAlign: TextAlign.center),
+                            Padding(padding: EdgeInsets.only(top: 50)),
+                            TextButton(
+                              child: Text("Attendance"),
+                              style: ButtonStyle(
+                                  textStyle: MaterialStateProperty.all(TextStyle(fontSize: 20)),
+                                  backgroundColor: MaterialStateProperty.all(Color(0xffff6816)),
+                                  foregroundColor: MaterialStateProperty.all(Colors.white)
+                              ),
+                              onPressed: (){
+                                setState(() {
+                                  menu = 'aa';
+                                });
+                              },
+                            ),
+                            Divider(
+                              indent: 40,
+                              endIndent: 40,
+                            ),
+                            TextButton(
+                              child: Text("Results"),
+                              style: ButtonStyle(
+                                  textStyle: MaterialStateProperty.all(TextStyle(fontSize: 20)),
+                                  backgroundColor: MaterialStateProperty.all(Color(0xffff6816)),
+                                  foregroundColor: MaterialStateProperty.all(Colors.white)
+                              ),
+                              onPressed: (){
+                                setState(() {
+                                  menu = 'ar';
+                                });
+                              },
+                            ),
+                            Divider(
+                              indent: 40,
+                              endIndent: 40,
+                            ),
+                            TextButton(
+                              child: Text("Logout"),
+                              style: ButtonStyle(
+                                  textStyle: MaterialStateProperty.all(TextStyle(fontSize: 20)),
+                                  backgroundColor: MaterialStateProperty.all(Colors.white),
+                                  foregroundColor: MaterialStateProperty.all(Colors.red)
+                              ),
+                              onPressed: () async{
+                                await FirebaseAuth.instance.signOut();
+                                Navigator.pop(context);
+                              },
+                            ),
+                            Divider(
+                              indent: 40,
+                              endIndent: 40,
+                            ),
+                          ],
+                        )
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left:20),
+                  ),
+                  SubSection(option: menu,),
+                ],
+              )
+            );
 
-                          Divider(
-                            indent: 40,
-                            endIndent: 40,
-                          ),
-                          TextButton(
-                            child: Text("Fee Details"),
-                            onPressed: (){
-                              setState(() {
-                                menu = 'fd';
-                              });
-                            },
-                          ),
-                          Divider(
-                            indent: 40,
-                            endIndent: 40,
-                          ),
-                          TextButton(
-                            child: Text("Attendance"),
-                            onPressed: (){
-                              setState(() {
-                                menu = 'a';
-                              });
-                            },
-                          ),
-                          Divider(
-                            indent: 40,
-                            endIndent: 40,
-                          ),
-                          TextButton(
-                            child: Text("Results"),
-                            onPressed: (){
-                              setState(() {
-                                menu = 'r';
-                              });
-                            },
-                          ),
-                          Divider(
-                            indent: 40,
-                            endIndent: 40,
-                          ),
-                          TextButton(
-                            child: Text("Logout"),
-                            onPressed: () async{
-                              await FirebaseAuth.instance.signOut();
-                              Navigator.pop(context);
-                            },
-                          ),
-                          Divider(
-                            indent: 40,
-                            endIndent: 40,
-                          ),
-                        ],
-                      ),
+            else return Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width/5,
+                    height: MediaQuery.of(context).size.height/1.2,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        color: Colors.grey[200],
+                        boxShadow: [
+                          BoxShadow(blurRadius: 10, color: Color(0xffbdbdbd))
+                        ]
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(left:20),
+                    child: Padding(
+                        padding: EdgeInsets.only(left: 50,right:50),
+                        child: ListView(
+                          children: [
+                            Padding(padding: EdgeInsets.only(top: 50)),
+                            Container(
+                              height: 300,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.red,
+                              ),
+                            ),
+                            Padding(padding: EdgeInsets.only(top: 20)),
+                            Text("${snapshot.data?.get('fname')} ${snapshot.data?.get('mname')} ${snapshot.data?.get('lname')}",textAlign: TextAlign.center,style: TextStyle(fontSize: 30),),
+                            Padding(padding: EdgeInsets.only(top: 10)),
+                            Text('STD: ${snapshot.data?.get('std')}     DIV: ${snapshot.data?.get('div')}     Roll No:${snapshot.data?.get('roll no')}',textAlign: TextAlign.center),
+                            Padding(padding: EdgeInsets.only(top: 10)),
+                            Text('DOB: ${snapshot.data?.get('dob').toString()}',textAlign: TextAlign.center,),
+                            Padding(padding: EdgeInsets.only(top: 10)),
+                            Text('Address: ${snapshot.data?.get('address').toString()}',textAlign: TextAlign.center,),
+                            Padding(padding: EdgeInsets.only(top: 10)),
+                            Text('City: ${snapshot.data?.get('city').toString()}',textAlign: TextAlign.center,),
+                            Padding(padding: EdgeInsets.only(top: 50)),
+                            TextButton(
+                              child: Text("Fee Details"),
+                              style: ButtonStyle(
+                                  textStyle: MaterialStateProperty.all(TextStyle(fontSize: 20)),
+                                  backgroundColor: MaterialStateProperty.all(Color(0xffff6816)),
+                                  foregroundColor: MaterialStateProperty.all(Colors.white)
+                              ),
+                              onPressed: (){
+                                setState(() {
+                                  menu = 'f';
+                                });
+                              },
+                            ),
+                            Divider(
+                              indent: 40,
+                              endIndent: 40,
+                            ),
+                            TextButton(
+                              child: Text("Attendance"),
+                              style: ButtonStyle(
+                                  textStyle: MaterialStateProperty.all(TextStyle(fontSize: 20)),
+                                  backgroundColor: MaterialStateProperty.all(Color(0xffff6816)),
+                                  foregroundColor: MaterialStateProperty.all(Colors.white)
+                              ),
+                              onPressed: (){
+                                setState(() {
+                                  menu = 'a';
+                                });
+                              },
+                            ),
+                            Divider(
+                              indent: 40,
+                              endIndent: 40,
+                            ),
+                            TextButton(
+                              child: Text("Results"),
+                              style: ButtonStyle(
+                                  textStyle: MaterialStateProperty.all(TextStyle(fontSize: 20)),
+                                  backgroundColor: MaterialStateProperty.all(Color(0xffff6816)),
+                                  foregroundColor: MaterialStateProperty.all(Colors.white)
+                              ),
+                              onPressed: (){
+                                setState(() {
+                                  menu = 'r';
+                                });
+                              },
+                            ),
+                            Divider(
+                              indent: 40,
+                              endIndent: 40,
+                            ),
+                            TextButton(
+                              child: Text("Logout"),
+                              style: ButtonStyle(
+                                  textStyle: MaterialStateProperty.all(TextStyle(fontSize: 20)),
+                                  backgroundColor: MaterialStateProperty.all(Colors.white),
+                                  foregroundColor: MaterialStateProperty.all(Colors.red)
+                              ),
+                              onPressed: () async{
+                                await FirebaseAuth.instance.signOut();
+                                Navigator.pop(context);
+                              },
+                            ),
+                            Divider(
+                              indent: 40,
+                              endIndent: 40,
+                            ),
+                          ],
+                        )
                     ),
-                    SubSection(option: menu,),
-                  ],
-                )
-              ],
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left:20),
+                  ),
+                  SubSection(option: menu,),
+                ],
+              )
             );
           }
           else return Center(
@@ -202,120 +302,99 @@ class _SubSectionState extends State<SubSection> {
             BoxShadow(blurRadius: 10, color: Color(0xffbdbdbd))
           ]
       ),
-      child: widget.option=='sd'?
+      child: widget.option=='s'?
 
-          //STUDENT DETAILS
+          // EMPTY PAGE
 
-      Column(
-        children: [
-          Container(
+     Container(
             height: 510,
             // width: MediaQuery.of(context).size.width/1.65,
             // color: Colors.orange,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+              borderRadius: BorderRadius.all(Radius.circular(20)),
               image: DecorationImage(
                 image: AssetImage('dashboard.jpg',),
                 fit: BoxFit.fill
               )
             ),
-          ),
-          Padding(padding: EdgeInsets.only(top: 30)),
-          FutureBuilder(
-              future: FirebaseFirestore.instance.collection('creds').doc(FirebaseAuth.instance.currentUser?.uid).get(),
-              builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot){
-                if(snapshot.hasData){
-                  return GridView(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 1,
-                      crossAxisSpacing: 1,
-                      childAspectRatio: 7.5
-                    ),
-                    physics: NeverScrollableScrollPhysics(),
-                    padding: EdgeInsets.all(30),
-                    shrinkWrap: true,
-                    children: [
-                      Text(
-                            'Name: ${snapshot.data?.get('fname')} ${snapshot.data?.get('mname')} ${snapshot.data?.get('lname')}',
-                            style: TextStyle(fontSize: 25),
-                      ),
-                      Text(
-                        'Address: ${snapshot.data?.get('address')}',
-                        style: TextStyle(fontSize: 25),
-                      ),
-                      Text(
-                        'STD: ${snapshot.data?.get('std')}',
-                        style: TextStyle(fontSize: 25),
-                      ),
-                      Text(
-                        'DOB: ${snapshot.data?.get('dob').toString()}',
-                        style: TextStyle(fontSize: 25),
-                      ),
-                      Text(
-                        'DIV: ${snapshot.data?.get('div').toString()}',
-                        style: TextStyle(fontSize: 25),
-                      ),
-                      Text(
-                        'City: ${snapshot.data?.get('city').toString()}',
-                        style: TextStyle(fontSize: 25),
-                      ),
-
-                    ],
-                  );
-                }
-                else return Center(
-                    child: CircularProgressIndicator()
-                );
-              }
-          )
-        ],
       ):
 
-          //FEE DETAILS
+          // FEE DETAILS
 
-      widget.option=='fd'?Padding(
+      widget.option=='f'?Padding(
         padding: EdgeInsets.all(50),
-        child: ListView(
-          children: [
-            ListTile(
-              title: Text('Tuition Fees'),
-              trailing: Text("2700"),
-            ),
-            Divider(),
-            ListTile(
-              title: Text('Tuition Fees'),
-              trailing: Text("2700"),
-            ),
-            Divider(),
-            ListTile(
-              title: Text('Tuition Fees'),
-              trailing: Text("2700"),
-            ),
-            Divider(),
-            ListTile(
-              title: Text('Tuition Fees'),
-              trailing: Text("2700"),
-            ),
-            Divider(),
-            ListTile(
-              title: Text('Tuition Fees'),
-              trailing: Text("2700"),
-            ),
-            Divider(),
-            ListTile(
-              title: Text('Tuition Fees'),
-              trailing: Text("2700"),
-            ),
-            Divider(),
-
-          ],
-        )
+        child: FutureBuilder(
+            future: FirebaseFirestore.instance.collection('creds').doc(FirebaseAuth.instance.currentUser?.uid).get(),
+            builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot){
+              if(snapshot.hasData)
+                return ListView(
+                  children: [
+                    ListTile(
+                      title: Text('First Installment'),
+                      trailing: Text("5000/-"),
+                    ),
+                    Divider(),
+                    ListTile(
+                      title: Text('Second Installment'),
+                      trailing: Text("5000/-"),
+                    ),
+                    Divider(),
+                    ListTile(
+                      title: Text('Third Installment'),
+                      trailing: Text("5000/-"),
+                    ),
+                    Divider(),
+                    ListTile(
+                      title: Text('Fourth Installment'),
+                      trailing: Text("5000/-"),
+                    ),
+                    Divider(),
+                    ListTile(
+                      title: Text('Fifth Installment'),
+                      trailing: Text("5000/-"),
+                    ),
+                    Divider(),
+                    ListTile(
+                      title: Text('Sixth Installment'),
+                      trailing: Text("5000/-"),
+                    ),
+                    Divider(),
+                    Padding(
+                      padding: EdgeInsets.all(50),
+                    ),
+                    GridView(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          childAspectRatio: 6
+                      ),
+                      shrinkWrap: true,
+                      // physics: NeverScrollableScrollPhysics(),
+                      children: [
+                        Text("Total", textAlign: TextAlign.center,style: TextStyle(fontSize:25),),
+                        Text(":", textAlign: TextAlign.center,style: TextStyle(fontSize:25)),
+                        Text("${snapshot.data?.get('fees')}/-", textAlign: TextAlign.center,style: TextStyle(fontSize:25)),
+                        Text("Installments Paid", textAlign: TextAlign.center,style: TextStyle(fontSize:25)),
+                        Text(":", textAlign: TextAlign.center,style: TextStyle(fontSize:25)),
+                        Text("${snapshot.data?.get('paid')}", textAlign: TextAlign.center,style: TextStyle(fontSize:25)),
+                        Text("Installments pending", textAlign: TextAlign.center,style: TextStyle(fontSize:25)),
+                        Text(":", textAlign: TextAlign.center,style: TextStyle(fontSize:25)),
+                        Text("${6-snapshot.data?.get('paid')}", textAlign: TextAlign.center,style: TextStyle(fontSize:25))
+                      ],
+                    )
+                  ],
+                );
+              else return Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.orange,
+                  )
+              );
+            }
+      )
       ):
 
           // ATTENDANCE DETAILS
 
-      Padding(
+      widget.option=='a'?Padding(
         padding: EdgeInsets.all(50),
         child: FutureBuilder(
             future: FirebaseFirestore.instance.collection('creds').doc(FirebaseAuth.instance.currentUser?.uid).get(),
@@ -325,7 +404,7 @@ class _SubSectionState extends State<SubSection> {
                 for(var date in snapshot.data?.get('holidays')) holidays.add(DateTime.fromMillisecondsSinceEpoch(date.seconds*1000));
                 Duration diff = DateTime.now().difference(DateTime(2021,7,1));
                 double percentage = (diff.inDays-holidays.length)*100/diff.inDays;
-                return Column(
+                return ListView(
                   children: [
                     TableCalendar(
                       focusedDay: DateTime.now(),
@@ -356,19 +435,72 @@ class _SubSectionState extends State<SubSection> {
                       ],
                     ),
                     Padding(padding: EdgeInsets.only(top: 50)),
-                    Text(""),
-                    Text(""),
-                    Text(""),
-
+                    GridView(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        childAspectRatio: 6
+                      ),
+                      shrinkWrap: true,
+                      // physics: NeverScrollableScrollPhysics(),
+                      children: [
+                        Text("Total Working days", textAlign: TextAlign.center,style: TextStyle(fontSize:25),),
+                        Text(":", textAlign: TextAlign.center,style: TextStyle(fontSize:25)),
+                        Text("${diff.inDays}", textAlign: TextAlign.center,style: TextStyle(fontSize:25)),
+                        Text("Present", textAlign: TextAlign.center,style: TextStyle(fontSize:25)),
+                        Text(":", textAlign: TextAlign.center,style: TextStyle(fontSize:25)),
+                        Text("${diff.inDays-holidays.length}", textAlign: TextAlign.center,style: TextStyle(fontSize:25)),
+                        Text("Absent", textAlign: TextAlign.center,style: TextStyle(fontSize:25)),
+                        Text(":", textAlign: TextAlign.center,style: TextStyle(fontSize:25)),
+                        Text("${holidays.length}", textAlign: TextAlign.center,style: TextStyle(fontSize:25))
+                      ],
+                    ),
                   ],
                 );
               }
               else return Center(
                   child: CircularProgressIndicator()
               );
-            })
-      )
+            }
+            )
+      ):
+
+          // RESULT DETAILS
+
+      widget.option=='aa'?Padding(
+        padding: EdgeInsets.all(50),
+        child: FutureBuilder(
+          future: FirebaseFirestore.instance.collection('creds').get(),
+          builder: (context, AsyncSnapshot<QuerySnapshot> snapshot){
+            if(snapshot.hasData){
+              List<Map<String, dynamic>> students = snapshot.data?.docs as List<Map<String, dynamic>>;
+              students.removeWhere((element) => element.keys.singleWhere((element) => element == 'admin') == 'admin');
+              return GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 6,
+                    mainAxisSpacing: 5
+                  ),
+                  itemBuilder: (context, index){
+                    return Card(
+                      child: Text(students[index].entries.singleWhere((element) => element.key=='fname').value),
+                    );
+                  }
+              );
+            }
+            else return Center(
+                child: CircularProgressIndicator()
+            );
+          },
+        ),
+      ):
+          widget.option=='ar'?Padding(
+            padding: EdgeInsets.all(50),
+            child: ListView(
+              children: [
+
+              ],
+            ),
+          ):
+              Container()
     );
   }
 }
-

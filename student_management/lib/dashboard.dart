@@ -32,20 +32,6 @@ class DashboardState extends State<Dashboard>{
             textSize: 15,
             onPressed: (){},
           ),
-          MenuButton(title: 'PAGES',
-            color: Colors.white,
-            hoveredTextColor: Colors.black,
-            notHoveredTextColor: Colors.white,
-            textSize: 15,
-            onPressed: (){},
-          ),
-          MenuButton(title: 'COURSES',
-            color: Colors.white,
-            hoveredTextColor: Colors.black,
-            notHoveredTextColor: Colors.white,
-            textSize: 15,
-            onPressed: (){},
-          ),
           MenuButton(title: 'CONTACT',
             color: Colors.white,
             hoveredTextColor: Colors.black,
@@ -84,7 +70,12 @@ class DashboardState extends State<Dashboard>{
                               height: 300,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.red,
+                                // color: Colors.red,
+                                image: DecorationImage(
+                                  image: NetworkImage(
+                                    snapshot.data?.get('image')
+                                  )
+                                )
                               ),
                             ),
                             Padding(padding: EdgeInsets.only(top: 20)),
@@ -92,6 +83,23 @@ class DashboardState extends State<Dashboard>{
                             Padding(padding: EdgeInsets.only(top: 10)),
                             Text('STD: ${snapshot.data?.get('std')}     DIV: ${snapshot.data?.get('div')}',textAlign: TextAlign.center),
                             Padding(padding: EdgeInsets.only(top: 50)),
+                            TextButton(
+                              child: Text("Students"),
+                              style: ButtonStyle(
+                                  textStyle: MaterialStateProperty.all(TextStyle(fontSize: 20)),
+                                  backgroundColor: MaterialStateProperty.all(Color(0xffff6816)),
+                                  foregroundColor: MaterialStateProperty.all(Colors.white)
+                              ),
+                              onPressed: (){
+                                setState(() {
+                                  menu = 'as';
+                                });
+                              },
+                            ),
+                            Divider(
+                              indent: 40,
+                              endIndent: 40,
+                            ),
                             TextButton(
                               child: Text("Attendance"),
                               style: ButtonStyle(
@@ -177,7 +185,11 @@ class DashboardState extends State<Dashboard>{
                               height: 300,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.red,
+                                image: DecorationImage(
+                                    image: NetworkImage(
+                                        snapshot.data?.get('image')
+                                    )
+                                ),
                               ),
                             ),
                             Padding(padding: EdgeInsets.only(top: 20)),
@@ -275,7 +287,6 @@ class DashboardState extends State<Dashboard>{
           );
         },
       )
-
     );
   }
 }
@@ -466,24 +477,147 @@ class _SubSectionState extends State<SubSection> {
 
           // RESULT DETAILS
 
-      widget.option=='aa'?Padding(
+      widget.option=='r'?
+      Padding(
+        padding: EdgeInsets.all(50),
+        child: FutureBuilder(
+          future: FirebaseFirestore.instance.collection('creds').doc(FirebaseAuth.instance.currentUser?.uid).get(),
+          builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot){
+            if(snapshot.hasData) return GridView(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 5
+              ),
+              children: [
+                FutureBuilder(
+                    future: FirebaseFirestore.instance.collection('creds').doc(FirebaseAuth.instance.currentUser?.uid).get(),
+                    builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot){
+                      if(snapshot.hasData) {
+                        Map<String,dynamic> data = snapshot.data?.data() as Map<String, dynamic>;
+                        if(data.containsKey('sem1')) return Card(
+                          child: Center(
+                            child: Text('Sem 1 Report Card')
+                          )
+                        );
+                        else return Card(
+                          child: Center(
+                            child: Text("Sem 1 N/A")
+                          )
+                        );
+                      }
+                      else return Center(
+                          child: CircularProgressIndicator()
+                      );
+                    }
+                  ),
+                FutureBuilder(
+                        future: FirebaseFirestore.instance.collection('creds').doc(FirebaseAuth.instance.currentUser?.uid).get(),
+                        builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot){
+                          if(snapshot.hasData) {
+                            Map<String,dynamic> data = snapshot.data?.data() as Map<String, dynamic>;
+                            if(data.containsKey('sem1')) return Card(
+                              child: Center(
+                                child: Text('Sem 2 Report Card')
+                              )
+                            );
+                            else return Card(
+                                child: Center(
+                                  child: Text("Sem 2 N/A")
+                                )
+                            );
+                          }
+                          else return Center(
+                              child: CircularProgressIndicator()
+                          );
+                        }
+                    )
+              ],
+            );
+            else return Center(
+                child: CircularProgressIndicator()
+            );
+          },
+        )
+      ):
+
+          // ADMIN STUDENT PORTAL
+      widget.option=='as'?
+      Padding(
         padding: EdgeInsets.all(50),
         child: FutureBuilder(
           future: FirebaseFirestore.instance.collection('creds').get(),
           builder: (context, AsyncSnapshot<QuerySnapshot> snapshot){
             if(snapshot.hasData){
-              List<Map<String, dynamic>> students = snapshot.data?.docs as List<Map<String, dynamic>>;
-              students.removeWhere((element) => element.keys.singleWhere((element) => element == 'admin') == 'admin');
+              List<Map<String, dynamic>> students=[];
+              for(int i=0;i<snapshot.data!.docs.length;i++){
+                Map<String,dynamic> temp = snapshot.data?.docs[i].data() as Map<String, dynamic>;
+                if(temp['std']==snapshot.data?.docs.singleWhere((element) => element.id==FirebaseAuth.instance.currentUser?.uid).get('std') && temp['div']==snapshot.data?.docs.singleWhere((element) => element.id==FirebaseAuth.instance.currentUser?.uid).get('div')) {
+                  if(!temp.containsKey('admin')) students.add(temp);
+                }
+              }
               return GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 6,
-                    mainAxisSpacing: 5
-                  ),
-                  itemBuilder: (context, index){
-                    return Card(
-                      child: Text(students[index].entries.singleWhere((element) => element.key=='fname').value),
-                    );
-                  }
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 5,
+                    mainAxisSpacing: 10,
+                    crossAxisSpacing: 10,
+                  childAspectRatio: 0.75
+                ),
+                itemCount: students.length,
+                itemBuilder: (context,index)=> Card(
+                  child: Stack(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Column(
+                            children: [
+                              Image.network(
+                                students[index]['image'],
+                                height: 200,
+                                errorBuilder: (context, object, e) => Container(
+                                  height: 200,
+                                  child: Text("Image not Available")
+                                ),
+                              ),
+                              Center(child: Text('${students[index]['fname']} ${students[index]['mname']} ${students[index]['lname']}'),),
+                              Text('${students[index]['roll no']}')
+                            ],
+                          ),
+                        ),
+                        TextButton(
+                            onPressed: (){
+                              showDialog(
+                                  context: context,
+                                  builder: (context)=>AlertDialog(
+                                    content: Container(
+                                      height: 400,
+                                      width: 700,
+                                      child: Scaffold(
+                                        body: Center(
+                                          child: GridView(
+                                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                                crossAxisCount: 2,
+                                                childAspectRatio: 3
+                                            ),
+                                            shrinkWrap: true,
+                                            physics: NeverScrollableScrollPhysics(),
+                                            children: [
+                                              Text("First Name: ${students[index]['fname']}",textAlign: TextAlign.center,),
+                                              Text("Middle Name: ${students[index]['mname']}",textAlign: TextAlign.center),
+                                              Text("Last Name: ${students[index]['lname']}",textAlign: TextAlign.center),
+                                            ],
+                                          ),
+                                        )
+                                      )
+                                    ),
+                                  )
+                              );
+                            },
+                            style: ButtonStyle(
+                              overlayColor: MaterialStateProperty.all(Colors.orange.withOpacity(0.2))
+                            ),
+                            child: Container())
+                      ],
+                    ),
+                ),
               );
             }
             else return Center(
@@ -492,7 +626,83 @@ class _SubSectionState extends State<SubSection> {
           },
         ),
       ):
-          widget.option=='ar'?Padding(
+          // ADMIN ATTENDANCE
+
+      widget.option=='aa'?Padding(
+        padding: EdgeInsets.all(50),
+        child: FutureBuilder(
+          future: FirebaseFirestore.instance.collection('creds').get(),
+          builder: (context, AsyncSnapshot<QuerySnapshot> snapshot){
+            if(snapshot.hasData){
+              List<Map<String, dynamic>> students=[];
+              for(int i=0;i<snapshot.data!.docs.length;i++){
+                Map<String,dynamic> temp = snapshot.data?.docs[i].data() as Map<String, dynamic>;
+                if(temp['std']==snapshot.data?.docs.singleWhere((element) => element.id==FirebaseAuth.instance.currentUser?.uid).get('std')) {
+                  if(!temp.containsKey('admin'))students.add(temp);
+                }
+              }
+              return GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 6,
+                          mainAxisSpacing: 5,
+                      ),
+                      itemCount: students.length,
+                      itemBuilder: (context, index){
+                        List<DateTime> holidays = [];
+                        for(var date in students[index]['holidays']) holidays.add(DateTime.fromMillisecondsSinceEpoch(date.seconds*1000));
+                        Duration diff = DateTime.now().difference(DateTime(2021,7,1));
+                        double percentage = (diff.inDays-holidays.length)*100/diff.inDays;
+                        return Card(
+                            child: Stack(
+                              children: [
+                                Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(students[index].entries.singleWhere((element) => element.key=='fname').value),
+                                      Text('${percentage.toString().substring(0,4)}%'),
+                                      Text('Present: ${diff.inDays-holidays.length}'),
+                                      Text('Absent: ${holidays.length}')
+                                    ],
+                                  ),
+                                ),
+                                TextButton(
+                                    style: ButtonStyle(
+                                        overlayColor: MaterialStateProperty.all(Colors.orange.withOpacity(0.1))
+                                    ),
+                                    onPressed: (){
+                                      showDialog(context: context, builder: (context) => AlertDialog(
+                                        content: Container(
+                                          height: 400,
+                                          width: 800,
+                                          child: TableCalendar(
+                                            focusedDay: DateTime.now(),
+                                            firstDay: DateTime(2021,7),
+                                            lastDay: DateTime.now(),
+
+                                            eventLoader: (day){
+                                              if(holidays.contains(day.toLocal())) return [1];
+                                              else return [];
+                                            },
+                                          )
+                                        ),
+                                      ));
+                                    },
+                                    child: Container()
+                                )
+                              ],
+                            )
+                        );
+                      }
+                  );
+            }
+            else return Center(
+                child: CircularProgressIndicator()
+            );
+          },
+        ),
+      ):
+      widget.option=='ar'?Padding(
             padding: EdgeInsets.all(50),
             child: ListView(
               children: [
@@ -500,7 +710,7 @@ class _SubSectionState extends State<SubSection> {
               ],
             ),
           ):
-              Container()
+      Container()
     );
   }
 }

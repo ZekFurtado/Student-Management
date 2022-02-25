@@ -107,7 +107,11 @@ class _LoginState extends State<Login>{
                                         if(_formkey.currentState!.validate()) {
                                           _formkey.currentState!.save();
                                           print("email: $_email, password: $_password");
-                                          await FirebaseAuth.instance.signInWithEmailAndPassword(email: _email, password: _password);
+                                          await FirebaseAuth.instance.signInWithEmailAndPassword(email: _email, password: _password).catchError((e){
+                                            showDialog(context: context, builder: (context) => AlertDialog(
+                                              title: Text("Invalid Credentials"),
+                                            ));
+                                          });
                                           Navigator.pop(context);
                                           setState(() {
 
@@ -184,20 +188,6 @@ class _LoginState extends State<Login>{
             titleSpacing: MediaQuery.of(context).size.width/10,
             actions: [
               MenuButton(title: 'HOME',
-                color: Colors.white,
-                hoveredTextColor: Colors.black,
-                notHoveredTextColor: Colors.white,
-                textSize: 15,
-                onPressed: (){},
-              ),
-              MenuButton(title: 'PAGES',
-                color: Colors.white,
-                hoveredTextColor: Colors.black,
-                notHoveredTextColor: Colors.white,
-                textSize: 15,
-                onPressed: (){},
-              ),
-              MenuButton(title: 'COURSES',
                 color: Colors.white,
                 hoveredTextColor: Colors.black,
                 notHoveredTextColor: Colors.white,

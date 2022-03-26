@@ -10,6 +10,7 @@ import 'dashboard.dart';
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
   runApp(const MaterialApp(
     debugShowCheckedModeBanner: false,
     home: Login()
@@ -113,9 +114,7 @@ class _LoginState extends State<Login>{
                                             ));
                                           });
                                           Navigator.pop(context);
-                                          setState(() {
-
-                                          });
+                                          setState(() {});
                                         }
                                       },
                                       obscureText: !showPass,
@@ -159,12 +158,13 @@ class _LoginState extends State<Login>{
     ];
     else return [
       MenuButton(
-                title: FirebaseAuth.instance.currentUser?.email as String,
+                title: FirebaseAuth.instance.currentUser?.displayName as String,
                 color: Colors.white,
                 hoveredTextColor: Colors.black,
                 notHoveredTextColor: Colors.white,
                 textSize: 15,
-                onPressed: (){
+                onPressed: () async{
+                  // await user?.updateDisplayName('Vandana');
                   Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -409,55 +409,5 @@ class _MenuButtonState extends State<MenuButton> {
           )
       ),
     );
-  }
-}
-
-class Counter extends StatefulWidget {
-  int limit;
-  Counter({Key? key,required this.limit}) : super(key: key);
-
-  @override
-  _CounterState createState() => _CounterState();
-}
-
-class _CounterState extends State<Counter> {
-  bool shit = false;
-  int start = 0;
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-          padding: const EdgeInsets.only(bottom: 100),
-          child: VisibilityDetector(
-              key: const Key("unique key"),
-              onVisibilityChanged: (info) async{
-                print("visibility: ${info.visibleFraction}");
-                if(info.visibleFraction == 0) start = 0;
-                if(info.visibleFraction!=0 && start==widget.limit || start == 0) {
-                  // shit = false;
-                  // start = 0;
-                  for(int i=0;i<=widget.limit;i++){
-                    // Timer(const Duration(milliseconds: 1000),(){
-                    // });
-                    await Future.delayed(const Duration(milliseconds: 1));
-                    print(i);
-                    setState(() {
-                      start=i;
-                    });
-                  }
-                }
-                // else {
-                //   shit = true;
-                //
-                // }
-              },
-            child: Container(
-                height: 100,
-                width: 200,
-                // color: Colors.green,
-                child: Text(start.toString(),textAlign: TextAlign.center,style: TextStyle(fontSize: 90))
-
-            )
-          )
-        );
   }
 }

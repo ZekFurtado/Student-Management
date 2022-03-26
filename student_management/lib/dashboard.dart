@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:student_management/updatestudent.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import 'main.dart';
+import 'newstudent.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -37,8 +39,20 @@ class DashboardState extends State<Dashboard>{
             hoveredTextColor: Colors.black,
             notHoveredTextColor: Colors.white,
             textSize: 15,
-            onPressed: (){},
+            onPressed: (){
+
+            },
           ),
+          FirebaseAuth.instance.currentUser?.displayName == 'Admin'?MenuButton(title: 'LOGOUT',
+            color: Colors.white,
+            hoveredTextColor: Colors.black,
+            notHoveredTextColor: Colors.white,
+            textSize: 15,
+            onPressed: () async {
+            await FirebaseAuth.instance.signOut();
+            Navigator.pop(context);
+            },
+          ):Container(),
           Padding(padding: EdgeInsets.only(right: MediaQuery.of(context).size.width/10))
         ],
       ),
@@ -47,7 +61,7 @@ class DashboardState extends State<Dashboard>{
         builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot){
           if(snapshot.hasData){
             Map<String,dynamic> data = snapshot.data?.data() as Map<String,dynamic>;
-            if(data.containsKey('admin')) return Center(
+            if(data.containsKey('tutor')) return Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -117,7 +131,7 @@ class DashboardState extends State<Dashboard>{
                               indent: 40,
                               endIndent: 40,
                             ),
-                            TextButton(
+                            /*TextButton(
                               child: Text("Results"),
                               style: ButtonStyle(
                                   textStyle: MaterialStateProperty.all(TextStyle(fontSize: 20)),
@@ -133,7 +147,7 @@ class DashboardState extends State<Dashboard>{
                             Divider(
                               indent: 40,
                               endIndent: 40,
-                            ),
+                            ),*/
                             TextButton(
                               child: Text("Logout"),
                               style: ButtonStyle(
@@ -159,6 +173,80 @@ class DashboardState extends State<Dashboard>{
                   ),
                   SubSection(option: menu,),
                 ],
+              )
+            );
+
+            else if(data.containsKey('admin')) return Container(
+              color: Colors.orange.withOpacity(0.3),
+              child: Center(
+                  child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Padding(
+                              padding: EdgeInsets.all(10),
+                            child: Container(
+                              height: 300,
+                                width: 600,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                                    color: Colors.white,
+                                    boxShadow: [
+                                      BoxShadow(blurRadius: 10, color: Color(0xffbdbdbd))
+                                    ]
+                                ),
+                                child: TextButton(
+                                  onPressed: (){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => NewStudent()
+                                      )
+                                    );
+                                  },
+                                  style: ButtonStyle(
+                                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(Radius.circular(20))
+                                    )
+                                    ),
+                                  ),
+                                  child: Text("New Student", style: TextStyle(fontSize: 23,color: Colors.black)),
+                                )
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Container(
+                                height: 300,
+                                width: 600,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                                    color: Colors.white,
+                                    boxShadow: [
+                                      BoxShadow(blurRadius: 10, color: Color(0xffbdbdbd))
+                                    ]
+                                ),
+                                child: TextButton(
+                                  onPressed: (){
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => UpdateStudent()
+                                        )
+                                    );
+                                  },
+                                  style: ButtonStyle(
+                                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(Radius.circular(20))
+                                    )),
+                                  ),
+                                  child: Text("Update Student Data", style: TextStyle(fontSize: 23,color: Colors.black)),
+                                )
+                            ),
+                          ),
+                        ],
+                      )
+                  )
               )
             );
 
@@ -412,9 +500,14 @@ class _SubSectionState extends State<SubSection> {
             builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot){
               if(snapshot.hasData){
                 List<DateTime> holidays = [];
-                for(var date in snapshot.data?.get('holidays')) holidays.add(DateTime.fromMillisecondsSinceEpoch(date.seconds*1000));
-                Duration diff = DateTime.now().difference(DateTime(2021,7,1));
-                double percentage = (diff.inDays-holidays.length)*100/diff.inDays;
+                print(snapshot.data?.get('holidays').length);
+                Duration diff = DateTime.now().difference(DateTime(2021, 7, 1));
+                double percentage = 100;
+                if (snapshot.data?.get('holidays').length!=0) {
+                  for (var date in snapshot.data?.get('holidays')) holidays.add(DateTime.fromMillisecondsSinceEpoch(date.seconds * 1000));
+                  percentage = (diff.inDays - holidays.length) * 100 / diff.inDays;
+                }
+                print("checkpoint");
                 return ListView(
                   children: [
                     TableCalendar(
@@ -423,8 +516,15 @@ class _SubSectionState extends State<SubSection> {
                       lastDay: DateTime.now(),
 
                       eventLoader: (day){
-                        if(holidays.contains(day.toLocal())) return [1];
-                        else return [];
+                        print("entered");
+                        if(holidays.contains(day.toLocal())) {
+                          print("checkpoin1");
+                          return [1];
+                        }
+                        else {
+                          print("checkpoin2");
+                          return [];
+                        }
                       },
                     ),
                     Padding(padding: EdgeInsets.only(top: 100),),
@@ -539,7 +639,8 @@ class _SubSectionState extends State<SubSection> {
         )
       ):
 
-          // ADMIN STUDENT PORTAL
+          // TUTOR STUDENT PORTAL
+
       widget.option=='as'?
       Padding(
         padding: EdgeInsets.all(50),
@@ -551,7 +652,7 @@ class _SubSectionState extends State<SubSection> {
               for(int i=0;i<snapshot.data!.docs.length;i++){
                 Map<String,dynamic> temp = snapshot.data?.docs[i].data() as Map<String, dynamic>;
                 if(temp['std']==snapshot.data?.docs.singleWhere((element) => element.id==FirebaseAuth.instance.currentUser?.uid).get('std') && temp['div']==snapshot.data?.docs.singleWhere((element) => element.id==FirebaseAuth.instance.currentUser?.uid).get('div')) {
-                  if(!temp.containsKey('admin')) students.add(temp);
+                  if(!temp.containsKey('admin') && !temp.containsKey('tutor')) students.add(temp);
                 }
               }
               return GridView.builder(
@@ -578,7 +679,7 @@ class _SubSectionState extends State<SubSection> {
                                 ),
                               ),
                               Center(child: Text('${students[index]['fname']} ${students[index]['mname']} ${students[index]['lname']}'),),
-                              Text('${students[index]['roll no']}')
+                              Text('Roll No: ${students[index]['roll no']}')
                             ],
                           ),
                         ),
@@ -586,29 +687,56 @@ class _SubSectionState extends State<SubSection> {
                             onPressed: (){
                               showDialog(
                                   context: context,
-                                  builder: (context)=>AlertDialog(
-                                    content: Container(
-                                      height: 400,
-                                      width: 700,
-                                      child: Scaffold(
-                                        body: Center(
-                                          child: GridView(
-                                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                                crossAxisCount: 2,
-                                                childAspectRatio: 3
-                                            ),
-                                            shrinkWrap: true,
-                                            physics: NeverScrollableScrollPhysics(),
-                                            children: [
-                                              Text("First Name: ${students[index]['fname']}",textAlign: TextAlign.center,),
-                                              Text("Middle Name: ${students[index]['mname']}",textAlign: TextAlign.center),
-                                              Text("Last Name: ${students[index]['lname']}",textAlign: TextAlign.center),
-                                            ],
-                                          ),
-                                        )
-                                      )
-                                    ),
-                                  )
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      content: Container(
+                                          height: 400,
+                                          width: 600,
+                                          child: Scaffold(
+                                              body: Center(
+                                                child:
+                                                /*Column(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                      children: [
+                                                        Text("First Name: ${students[index]['fname']}",textAlign: TextAlign.center,style: TextStyle(fontSize: 20)),
+                                                        Text("Middle Name: ${students[index]['mname']}",textAlign: TextAlign.center,style: TextStyle(fontSize: 20)),
+                                                        Text("Last Name: ${students[index]['lname']}",textAlign: TextAlign.center,style: TextStyle(fontSize: 20)),
+                                                      ],
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                      children: [
+                                                        Text("Address: ${students[index]['address']}",textAlign: TextAlign.center,style: TextStyle(fontSize: 20)),
+                                                        Text("STD: ${students[index]['std']}",textAlign: TextAlign.center,style: TextStyle(fontSize: 20)),
+                                                        Text("DIV: ${students[index]['div']}",textAlign: TextAlign.center,style: TextStyle(fontSize: 20)),
+                                                      ],
+                                                    )
+                                                  ],
+                                                )*/
+                                                GridView(
+                                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                                      crossAxisCount: 3,
+                                                      childAspectRatio: 3
+                                                  ),
+                                                  shrinkWrap: true,
+                                                  physics: NeverScrollableScrollPhysics(),
+                                                  children: [
+                                                    Text("First Name: ${students[index]['fname']}",textAlign: TextAlign.center,),
+                                                    Text("Middle Name: ${students[index]['mname']}",textAlign: TextAlign.center),
+                                                    Text("Last Name: ${students[index]['lname']}",textAlign: TextAlign.center),
+                                                    Text("STD: ${students[index]['std']}",textAlign: TextAlign.center),
+                                                    Text("DIV: ${students[index]['div']}",textAlign: TextAlign.center),
+                                                    Text("Address: ${students[index]['address']}",textAlign: TextAlign.center),
+                                                  ],
+                                                ),
+                                              )
+                                          )
+                                      ),
+                                    );
+                                  }
                               );
                             },
                             style: ButtonStyle(
@@ -626,7 +754,8 @@ class _SubSectionState extends State<SubSection> {
           },
         ),
       ):
-          // ADMIN ATTENDANCE
+
+          // TUTOR ATTENDANCE
 
       widget.option=='aa'?Padding(
         padding: EdgeInsets.all(50),
@@ -638,13 +767,14 @@ class _SubSectionState extends State<SubSection> {
               for(int i=0;i<snapshot.data!.docs.length;i++){
                 Map<String,dynamic> temp = snapshot.data?.docs[i].data() as Map<String, dynamic>;
                 if(temp['std']==snapshot.data?.docs.singleWhere((element) => element.id==FirebaseAuth.instance.currentUser?.uid).get('std')) {
-                  if(!temp.containsKey('admin'))students.add(temp);
+                  if(!temp.containsKey('admin') && !temp.containsKey('tutor'))students.add(temp);
                 }
               }
               return GridView.builder(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 6,
                           mainAxisSpacing: 5,
+                        childAspectRatio: 0.6
                       ),
                       itemCount: students.length,
                       itemBuilder: (context, index){
@@ -659,6 +789,14 @@ class _SubSectionState extends State<SubSection> {
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
+                                      Image.network(
+                                        students[index]['image'],
+                                        height: 200,
+                                        errorBuilder: (context, object, e) => Container(
+                                            height: 200,
+                                            child: Text("Image not Available")
+                                        ),
+                                      ),
                                       Text(students[index].entries.singleWhere((element) => element.key=='fname').value),
                                       Text('${percentage.toString().substring(0,4)}%'),
                                       Text('Present: ${diff.inDays-holidays.length}'),
@@ -702,6 +840,7 @@ class _SubSectionState extends State<SubSection> {
           },
         ),
       ):
+
       widget.option=='ar'?Padding(
             padding: EdgeInsets.all(50),
             child: ListView(

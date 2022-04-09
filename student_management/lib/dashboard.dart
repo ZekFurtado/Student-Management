@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:student_management/report.dart';
 import 'package:student_management/updatestudent.dart';
 import 'package:table_calendar/table_calendar.dart';
-
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'main.dart';
 import 'newstudent.dart';
 
@@ -502,7 +504,7 @@ class _SubSectionState extends State<SubSection> {
                 List<DateTime> holidays = [];
                 print(snapshot.data?.get('holidays').length);
                 Duration diff = DateTime.now().difference(DateTime(2021, 7, 1));
-                double percentage = 100;
+                double percentage = 100.00001;
                 if (snapshot.data?.get('holidays').length!=0) {
                   for (var date in snapshot.data?.get('holidays')) holidays.add(DateTime.fromMillisecondsSinceEpoch(date.seconds * 1000));
                   percentage = (diff.inDays - holidays.length) * 100 / diff.inDays;
@@ -516,15 +518,8 @@ class _SubSectionState extends State<SubSection> {
                       lastDay: DateTime.now(),
 
                       eventLoader: (day){
-                        print("entered");
-                        if(holidays.contains(day.toLocal())) {
-                          print("checkpoin1");
-                          return [1];
-                        }
-                        else {
-                          print("checkpoin2");
-                          return [];
-                        }
+                        if(holidays.contains(day.toLocal())) return [1];
+                        else return [];
                       },
                     ),
                     Padding(padding: EdgeInsets.only(top: 100),),
@@ -540,7 +535,7 @@ class _SubSectionState extends State<SubSection> {
                           width: percentage*(MediaQuery.of(context).size.width/1.65-100.1)/100,
                           color: Colors.green,
                           child: Center(
-                            child: Text("${percentage.toString().substring(0,4)}%",style: TextStyle(color: Colors.white,fontSize: 25),)
+                            child: Text("${percentage.toString().substring(0,5)}%",style: TextStyle(color: Colors.white,fontSize: 25),)
                           )
                         )
                       ],
@@ -595,7 +590,49 @@ class _SubSectionState extends State<SubSection> {
                         Map<String,dynamic> data = snapshot.data?.data() as Map<String, dynamic>;
                         if(data.containsKey('sem1')) return Card(
                           child: Center(
-                            child: Text('Sem 1 Report Card')
+                            child: Stack(
+                              children: [
+                                Center(
+                                  child: Text("Semester 1 Report Card")
+                                ),
+                                TextButton(
+                                    onPressed: (){
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => Report(data: data)
+                                        )
+                                      );
+                                      /*showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return AlertDialog(
+                                              content: Container(
+                                                  child: FutureBuilder(
+                                                    future: FirebaseStorage.instance.ref('${data['std']}/${data['std']}th ${data['div']} ${data['roll no']} 1st Sem.pdf').getDownloadURL(),
+                                                    builder: (context, AsyncSnapshot<String> snapshot){
+                                                      if(snapshot.hasData){
+                                                        print(snapshot.data.toString());
+                                                        return SfPdfViewer.network(snapshot.data.toString());
+                                                      }
+                                                      else return Center(
+                                                          child: CircularProgressIndicator()
+
+
+                                                      );
+                                                    },
+                                                  )
+                                              ),
+                                            );
+                                          }
+                                      );*/
+                                    },
+                                    style: ButtonStyle(
+                                        overlayColor: MaterialStateProperty.all(Colors.orange.withOpacity(0.2))
+                                    ),
+                                    child: Container())
+                              ],
+                            )
                           )
                         );
                         else return Card(

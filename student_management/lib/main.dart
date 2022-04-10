@@ -59,7 +59,7 @@ class _LoginState extends State<Login>{
                 return SizedBox(
                     child: StatefulBuilder(
                       builder: (context, setState) => AlertDialog(
-                          title: const Text("Log In",textAlign: TextAlign.center,),
+                          title: const Text("Log In",textAlign: TextAlign.center,style: TextStyle(fontWeight: FontWeight.bold),),
                           content: Form(
                               key: _formkey,
                               child: Column(
@@ -199,7 +199,29 @@ class _LoginState extends State<Login>{
                 hoveredTextColor: Colors.black,
                 notHoveredTextColor: Colors.white,
                 textSize: 15,
-                onPressed: (){},
+                onPressed: (){
+                  showDialog(
+                    builder: (BuildContext context) {
+                      return SizedBox(
+                        child: StatefulBuilder(
+                            builder: (context, setState) => AlertDialog(
+                                title: const Text("Contact Us",textAlign: TextAlign.center,style: TextStyle(fontWeight: FontWeight.bold),),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text("Tel. No.: 1800-123-456"),
+                                    Text("Email: support@nhs.com")
+                                  ],
+                                )
+                            )),
+
+                      );
+                    },
+                    context: context,
+
+                  );
+                },
               ),
               actions(context).first,
               Padding(padding: EdgeInsets.only(right: MediaQuery.of(context).size.width/10))
@@ -281,88 +303,44 @@ class _LoginState extends State<Login>{
           Padding(
             padding: EdgeInsets.only(top: 100)
           ),
-          Container(
-            // color: Colors.green,
-            height: 500,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Image.asset('school.png',fit: BoxFit.cover),
-                Container(
-                  width: 500,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Container(
+                color: Colors.black,
+                height: 300,
+                width: MediaQuery.of(context).size.width/2,
+                child: Padding(
+                  padding: EdgeInsets.only(left: 20, right: 20),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Text(
-                          'Our Mission',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontSize: 23,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
-                              decorationStyle: TextDecorationStyle.double
-                          )
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 20),
-                      ),
-                      Text(
-                          "Nirmala High School is an open-admission public charter school that prepares all students for college admissions and successful careers. NHS provides a rigorous high school curriculum with an emphasis in science and mathematics in a supportive environment of learning and respect that prepares students to make informed choices about post-secondary pursuits.",
-                          textAlign: TextAlign.justify,
-                          style: TextStyle(fontSize: 18)
-                      )
+                      Padding(padding: EdgeInsets.only(top: 50),),
+                      Text("About Us",style: TextStyle(color: Colors.white,fontSize: 35),textAlign: TextAlign.left,),
+                      Padding(padding: EdgeInsets.only(top: 20),),
+                      Text("We are pleased to welcome you to the Nirmala High School campus, one of Mira Road's Select Schools. At Nirmala, we strive to create a secure, supportive, and challenging environment in which children may develop into active, introspective, and creative learners who take ownership of their learning, take pride in their community, and are prepared to participate in a culturally varied world.",style: TextStyle(color: Colors.white,fontSize: 18)),
+                    ],
+                  ),
+                ),
+              ),
+              Container(
+                color: Colors.black,
+                height: 300,
+                width: MediaQuery.of(context).size.width/2,
+                child: Padding(
+                  padding: EdgeInsets.only(left: 20, right: 20),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Padding(padding: EdgeInsets.only(top: 50),),
+                      Text("Our Mission",style: TextStyle(color: Colors.white,fontSize: 35),textAlign: TextAlign.left,),
+                      Padding(padding: EdgeInsets.only(top: 20),),
+                      Text("Nirmala High School prepares students to comprehend, contribute to, and achieve in a fast changing society, therefore contributing to the creation of a more fair and equitable world. We will guarantee that our students acquire both the skills necessary for success and leadership in the burgeoning creative economy and the competencies necessary for success and leadership in the rising creative economy. Additionally, we will be a leader in developing practical and theoretical knowledge that helps individuals to have a better understanding of our environment and to enhance the living standards of local and global populations.",style: TextStyle(color: Colors.white,fontSize: 18)),
                     ],
                   )
-                )
-              ]
-            )
-          ),
-          Container(
-            height: 500,
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                        width: 500,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                                'Admissions Open',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontSize: 23,
-                                    fontWeight: FontWeight.bold,
-                                    decoration: TextDecoration.underline,
-                                    decorationStyle: TextDecorationStyle.double
-                                )
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 20),
-                            ),
-                            Text(
-                                "Applications for the 2021-2022 school year opened on October 1, 2020. This application is valid for students turning 5 years old on or before September 1, 2021. The lottery for the 2021-2022 school year took place on February 1, 2021. All new applications will go on a waitlist and you will be contacted as space becomes available. ",
-                                textAlign: TextAlign.justify,
-                                style: TextStyle(fontSize: 18)
-                            )
-                          ],
-                        )
-                    ),
-                    Image.asset('admission.jpg',fit: BoxFit.cover),
-                  ]
-              )
-          ),
-          Container(
-              height: 300,
-            color: Colors.black,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text("About Us",style: TextStyle(color: Colors.white)),
-                  Text("About Us",style: TextStyle(color: Colors.white)),
-                  Text("About Us",style: TextStyle(color: Colors.white))
-                ],
-              )
+                ),
+              ),
+            ],
           )
         ],
       )
